@@ -12,6 +12,6 @@ public interface ITripRepositorie
     Task<bool> DoesTripExist(int tripID);
     Task<bool> DidTripEnd(int tripId);
     Task<bool> DoesDateMatch(string pesel, int tripId);
-    // Task AssignClient();
+    Task AssignClient(AssignTripDTO dto, int id);
 
 }

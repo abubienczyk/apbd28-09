@@ -46,6 +46,7 @@ public class TripsController : ControllerBase
             return Conflict("This trip has already happend");
         if (!await _tripRepositorie.DoesDateMatch(dto.Pesel, idTrip))
             return Conflict("Registered date dose not match request date");
+        await _tripRepositorie.AssignClient(dto, idTrip);
         return Ok();
     }
     /* dodawanie wycieczek

@@ -85,10 +85,12 @@ public class TripRepositorie : ITripRepositorie
 
     public async Task DeleteClient(int id)
     {
-        var result =  _context.Clients.Where(e => e.IdClient == id);
+        var result =  _context.Clients.Where(e => e.IdClient == id).FirstOrDefaultAsync();;
         if (result != null)
         {
-            await _context.Clients.Where(e => e.IdClient == id).ExecuteDeleteAsync();
+           // await _context.Clients.Where(e => e.IdClient == id).ExecuteDeleteAsync();
+             _context.Clients.Remove(await result);
+             await _context.SaveChangesAsync();
         }
     }
 
@@ -124,11 +126,7 @@ public class TripRepositorie : ITripRepositorie
     {
         //var time=_context.Trips.Where(t=>  t.IdTrip==tripId).Select(t=> t.DateFrom);
         var time=_context.Trips.FirstOrDefault(t => t.IdTrip == tripId);
-        var result = false;
-        if (time.DateFrom <= DateTime.Now)
-        {
-            result= true;
-        }
+        bool result = time.DateFrom <= DateTime.Now;
 
         return result;
     }
@@ -138,12 +136,35 @@ public class TripRepositorie : ITripRepositorie
         var client = _context.Clients.FirstOrDefault(c => c.Pesel == pesel);
         var id = client.IdClient;
         var time=_context.ClientTrips.FirstOrDefault(t => t.IdTrip == tripId && t.IdClient==id);
-        var result = false;
-        if (time.RegisteredAt == DateTime.Now)
-        {
-            result= true;
-        }
+        bool result = time.RegisteredAt == DateTime.Now;
 
         return result;
+    }
+
+    public async Task AssignClient(AssignTripDTO dto, int id)
+    {
+        var newClient = new Client
+        {
+            FirstName = dto.FirstName,
+            LastName = dto.LastName,
+            Email = dto.Email,
+            Telephone = dto.Telephone,
+            Pesel = dto.Pesel
+        };
+
+        _context.Clients.Add(newClient);
+        await _context.SaveChangesAsync();
+        
+        var newTrip = new ClientTrip
+        {
+            IdClient = newClient.IdClient,
+            IdTrip = id,
+            RegisteredAt = DateTime.Now,
+            PaymentDate = dto.PaymentDate
+        };
+
+        _context.ClientTrips.Add(newTrip);
+        await _context.SaveChangesAsync();
+        
     }
 }
