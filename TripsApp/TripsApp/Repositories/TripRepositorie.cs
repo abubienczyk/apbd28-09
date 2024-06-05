@@ -1,10 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TripsApp.Data;
 using TripsApp.DTO_s;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using TripsApp.Models;
 
 namespace TripsApp.Repositories;
@@ -20,7 +16,7 @@ public class TripRepositorie : ITripRepositorie
 
     public async Task<GetTripDTO> GetTrips(int page, int pageSize)
     {
-        /* dodawanie wycieczek
+        /* szukanie wycieczek --> instr
      var trips = await _context.Trips.Select(e => new TripDTO()
        {
        Name = e.Name,
@@ -85,18 +81,18 @@ public class TripRepositorie : ITripRepositorie
 
     public async Task DeleteClient(int id)
     {
-        var result =  _context.Clients.Where(e => e.IdClient == id).FirstOrDefaultAsync();;
+        var result =  await _context.Clients.Where(e => e.IdClient == id).FirstOrDefaultAsync();;
         if (result != null)
         {
            // await _context.Clients.Where(e => e.IdClient == id).ExecuteDeleteAsync();
-             _context.Clients.Remove(await result);
+             _context.Clients.Remove( result);
              await _context.SaveChangesAsync();
         }
     }
 
     public async Task<bool> DoesClientExist(string pesel)
     {
-        var methodSyntax=_context.Clients.Where(c => c.Pesel == pesel).Count();
+        var methodSyntax= _context.Clients.Where(c => c.Pesel == pesel).Count();
         bool result = false;
         if (methodSyntax == 0) result = false;
         else  result = true;
